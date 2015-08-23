@@ -42,23 +42,25 @@ import time
 import configparser
 import cherrypy
 
-#ser = serial.Serial('/dev/ttyUSB0', 115200, timeout=1)
+ser = serial.Serial('/dev/ttyUSB0', 115200, timeout=1)
 
-#def serialread():
-#	line=ser.readline()
-#	inputArray=line.decode('utf-8').split(",")
+def serialread():
+	line=ser.readline()
+	inputArray=line.decode('utf-8').split(",")
 
 def utacooler(step):
 	if valveStatus[0] > 0:
 		valveStatus[0] = valveStatus[0] - step
 	else:
-		valveStatus[2] = valveStatus[2] + step
+		if (compressorOn = 1):
+			valveStatus[2] = valveStatus[2] + step
 
 def utahotter(step):
 	if valveStatus[2] > 0:
 		valveStatus[2] = valveStatus[2] - step
 	else:
-		valveStatus[0] = valveStatus[0] + step
+		if (heaterOn = 1):
+			valveStatus[0] = valveStatus[0] + step
 
 def uta():
 	if relaisStatus[4] == 1:	#If UTA fan turned on
