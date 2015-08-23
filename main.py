@@ -40,12 +40,13 @@
 
 import time
 import configparser
+import cherrypy
 
-ser = serial.Serial('/dev/ttyUSB0', 115200, timeout=1)
+#ser = serial.Serial('/dev/ttyUSB0', 115200, timeout=1)
 
-def serialread():
-	line=ser.readline()
-	inputArray=line.decode('utf-8').split(",")
+#def serialread():
+#	line=ser.readline()
+#	inputArray=line.decode('utf-8').split(",")
 
 def utacooler(step):
 	if valveStatus[0] > 0:
@@ -60,17 +61,25 @@ def utahotter(step):
 		valveStatus[0] = valveStatus[0] + step
 
 def uta():
-	if relaisStatus[4] = 1:	#If UTA fan turned on
+	if relaisStatus[4] == 1:	#If UTA fan turned on
 		if (inputArray[14] > utaAirOut+utaTempDelta):
 			utacooler(1);
-		else if (inputArray[14] < utaAirOut-utaTempDelta):
+		elif (inputArray[14] < utaAirOut-utaTempDelta):
 			utahotter(1);
-		else:
-			valveStatus[0] = 0
-			valveStatus[2] = 0
 	else:
 		valveStatus[0] = 0
 		valveStatus[2] = 0
+		time.sleep(0.25)
+
+
+def fancoil():
+	if relaisStatus[8] == 1:
+		if (inputArray[6] > fancoilWaterOut-fancoilTempDelta):
+			valveStatus[1] = valveStatus[1]-1
+		elif (inputArray[6] < fancoilWaterOut+fancoilTempDelta):
+			valveStatus[1] = valveStatus[1]+1
+	else:
+		valveStatus[1] = 0
 		time.sleep(0.25)
 
 
@@ -79,13 +88,13 @@ def uta():
 config = configparser.ConfigParser()
 config.read("hvac.conf")
 
-heaterOn 		= config.["General"]["heaterOn"]
-compressorOn 	= config.["General"]["compressorOn"]
+heaterOn 		= config["General"]["heaterOn"]
+compressorOn 	= config["General"]["compressorOn"]
 
-utaAirOut 		= config.["Temp"]["utaAirOut"]
-utaTempDelta 	= config.["Temp"]["utaTempDelta"]
-fancoilWaterOut = config.["Temp"]["fancoilWaterOut"]
-fancoilTempDelta= config.["Temp"]["fancoilTempDelta"]
+utaAirOut 		= config["Temp"]["utaAirOut"]
+utaTempDelta 	= config["Temp"]["utaTempDelta"]
+fancoilWaterOut = config["Temp"]["fancoilWaterOut"]
+fancoilTempDelta= config["Temp"]["fancoilTempDelta"]
 
 relaisStatus = [0,0,0,0,0,0,0,0]
 valveStatus  = [0,0,0]
